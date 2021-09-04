@@ -7,7 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  push_to_registries:
+    name: Push Docker image to multiple registries
     runs-on: ubuntu-latest
 
     steps:
@@ -34,17 +35,24 @@ jobs:
       #    name: Package
       #    path: staging
       
-      - name: CI to Docker Hub
+      - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          
+      - name: Log in to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Build and push
+      - name: Build and Push to Docker Hub
         id: docker_build
         uses: docker/build-push-action@v2
         with:
@@ -53,5 +61,15 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/demo:latest
 
-      - name: Image digest
+      - name: Build and Push to Github Docker Registry
+        id: github_docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: docker.pkg.github.com/${{ github.repository }}/my-image:${{ github.ref }}
+
+      - name: Image digest Docker Hub
         run: echo ${{ steps.docker_build.outputs.digest }}
+        
+      - name: Image digest Github Docker Registry
+        run: echo ${{ steps.github_docker_build.outputs.digest }}
