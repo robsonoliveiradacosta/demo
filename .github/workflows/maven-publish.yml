@@ -60,3 +60,12 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: docker.pkg.github.com/${{ github.repository }}/image-name:latest
+          
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.D)_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_KEY }}
+          port: ${{ secrets.DO_PORT }}
+          script: whoami
