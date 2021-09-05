@@ -73,5 +73,6 @@ jobs:
           port: ${{ secrets.DO_PORT }}
           script: |
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.PROJECT }}:${{ env.TAG }}
+            docker image prune -af
             docker rm -f ${{ env.PROJECT }}-app
             docker run -d -p 80:8080 --name ${{ env.PROJECT }}-app ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.PROJECT }}:${{ env.TAG }}

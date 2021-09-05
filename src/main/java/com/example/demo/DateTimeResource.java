@@ -14,4 +14,9 @@ public class DateTimeResource {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
 	}
 
+	@GetMapping("/")
+	public String api() {
+		return "API for Demo App";
+	}
+
 }
