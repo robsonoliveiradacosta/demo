@@ -10,6 +10,9 @@ jobs:
   ci_cd:
     name: CI / CD
     runs-on: ubuntu-latest
+    env:
+      PROJECT: demo
+      TAG: latest
 
     steps:
       - uses: actions/checkout@v2
@@ -50,7 +53,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/demo:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.PROJECT }}:${{ env.TAG }}
 
       - name: Build and Push to Github Docker Registry
         id: github_docker_build
@@ -59,7 +62,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: docker.pkg.github.com/${{ github.repository }}/image-name:latest
+          tags: docker.pkg.github.com/${{ github.repository }}/${{ env.PROJECT }}:${{ env.TAG }}
           
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.4
@@ -69,6 +72,6 @@ jobs:
           key: ${{ secrets.DO_KEY }}
           port: ${{ secrets.DO_PORT }}
           script: |
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/demo:latest
-            docker rm -f demo-app
-            docker run -d -p 80:8080 --name demo-app ${{ secrets.DOCKER_HUB_USERNAME }}/demo:latest
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.PROJECT }}:${{ env.TAG }}
+            docker rm -f ${{ env.PROJECT }}-app
+            docker run -d -p 80:8080 --name ${{ env.PROJECT }}-app ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.PROJECT }}:${{ env.TAG }}
