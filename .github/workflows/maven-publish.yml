@@ -60,6 +60,7 @@ jobs:
         with:
           context: ./
           file: ./Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.PROJECT }}:${{ env.TAG }}
           cache-from: type=local,src=/tmp/.buildx-cache
@@ -71,6 +72,7 @@ jobs:
         with:
           context: ./
           file: ./Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: docker.pkg.github.com/${{ github.repository }}/${{ env.PROJECT }}:${{ env.TAG }}
           cache-from: type=local,src=/tmp/.buildx-cache
