@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  push_to_registries:
-    name: Push Docker image to multiple registries
+  ci_cd:
+    name: CI / CD
     runs-on: ubuntu-latest
 
     steps:
@@ -68,4 +68,7 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_KEY }}
           port: ${{ secrets.DO_PORT }}
-          script: docker --version
+          script: |
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/demo:latest
+            docker rm -f demo-app
+            docker run -d -p 80:8080 --name demo-app ${{ secrets.DOCKER_HUB_USERNAME }}/demo:latest
