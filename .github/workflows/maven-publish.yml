@@ -33,14 +33,6 @@ jobs:
       - name: Build with Maven
         run: mvn package
 
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -60,11 +52,8 @@ jobs:
         with:
           context: ./
           file: ./Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.PROJECT }}:${{ env.TAG }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Build and Push to Github Docker Registry
         id: github_docker_build
@@ -72,11 +61,8 @@ jobs:
         with:
           context: ./
           file: ./Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: docker.pkg.github.com/${{ github.repository }}/${{ env.PROJECT }}:${{ env.TAG }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.4
